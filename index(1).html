@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SF75 divertor — unfold</title>
+<meta name="description" content="SF75 snowflake divertor unfold animation.">
+
+<!-- Instrument-panel mono for the caption; system sans fallback if offline -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --vessel:#0a0c0f;        /* near-black vacuum vessel */
+    --vessel-2:#11151b;      /* panel */
+    --ink:#e8eef2;           /* primary text */
+    --muted:#7d8a96;         /* secondary text */
+    --plasma:#39d6e6;        /* single cyan accent */
+    --hair:rgba(125,138,150,.22);
+    --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% 0%, #12171e 0%, var(--vessel) 60%) fixed,
+      var(--vessel);
+    color:var(--ink);
+    font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+    min-height:100svh;
+  }
+
+  /* ---- stage: the animation is the hero ---- */
+  .stage{
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:clamp(12px,4vw,40px);
+    position:relative;
+  }
+
+  .frame{
+    position:relative;
+    width:min(100%, 1100px);
+    aspect-ratio:16/9;
+    background:#000;
+    border:1px solid var(--hair);
+    box-shadow:0 0 0 1px rgba(57,214,230,.06), 0 24px 60px -20px rgba(0,0,0,.8);
+  }
+  /* corner ticks — instrument framing, not decoration */
+  .frame::before,.frame::after{
+    content:"";position:absolute;width:14px;height:14px;pointer-events:none;
+    border:1px solid var(--plasma);opacity:.55;
+  }
+  .frame::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .frame::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+  video{
+    display:block;width:100%;height:100%;object-fit:contain;background:#000;
+  }
+
+  /* ---- tap-to-play fallback (autoplay blocked / reduced motion) ---- */
+  .play{
+    position:absolute;inset:0;display:none;
+    align-items:center;justify-content:center;
+    background:rgba(8,10,13,.55);backdrop-filter:blur(2px);
+    cursor:pointer;border:0;color:var(--ink);font-family:var(--mono);
+  }
+  .play.show{display:flex}
+  .play span{
+    display:flex;align-items:center;gap:.6rem;
+    font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;
+    padding:.7rem 1.1rem;border:1px solid var(--plasma);
+    background:rgba(57,214,230,.08);color:var(--plasma);
+  }
+  .play span::before{
+    content:"";width:0;height:0;border-style:solid;
+    border-width:7px 0 7px 12px;border-color:transparent transparent transparent var(--plasma);
+  }
+
+  /* ---- fullscreen toggle ---- */
+  .fs{
+    position:absolute;right:10px;bottom:10px;
+    width:38px;height:38px;display:grid;place-items:center;
+    background:rgba(10,12,15,.6);border:1px solid var(--hair);
+    color:var(--muted);cursor:pointer;
+  }
+  .fs:hover{color:var(--plasma);border-color:var(--plasma)}
+  .fs svg{width:16px;height:16px}
+
+  /* ---- caption / readout ---- */
+  .caption{
+    width:min(100%,1100px);margin:0 auto;
+    padding:14px clamp(12px,4vw,40px) clamp(20px,5vw,36px);
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1.4rem;
+  }
+  .eyebrow{
+    color:var(--plasma);font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+    border-left:2px solid var(--plasma);padding-left:.6rem;
+  }
+  .title{font-size:clamp(.95rem,2.6vw,1.15rem);font-weight:500;letter-spacing:.01em}
+  .sub{color:var(--muted);font-size:.8rem;letter-spacing:.02em}
+  .attr{margin-left:auto;color:var(--muted);font-size:.72rem;letter-spacing:.06em}
+
+  @media (max-width:560px){
+    .attr{margin-left:0;flex-basis:100%}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    body{background:var(--vessel)}
+  }
+</style>
+</head>
+<body>
+
+  <main class="stage">
+    <div class="frame">
+      <!-- EDIT VIDEO SOURCE HERE if you rename the file -->
+      <video id="v" playsinline muted loop preload="auto" poster="poster.jpg">
+        <source src="sf75-unfold.mp4" type="video/mp4">
+      </video>
+
+      <button class="play" id="play" aria-label="Play animation"><span>Play</span></button>
+
+      <button class="fs" id="fs" aria-label="Toggle fullscreen" title="Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <!-- EDIT CAPTION TEXT HERE -->
+  <footer class="caption">
+    <span class="eyebrow">Edge plasma · divertor</span>
+    <span class="title">SF75 snowflake configuration — separatrix unfold</span>
+    <span class="sub">MAST-U · BOUT++ / Hermes-3</span>
+    <span class="attr">scan to replay</span>
+  </footer>
+
+<script>
+  const v = document.getElementById('v');
+  const play = document.getElementById('play');
+  const fs = document.getElementById('fs');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function showPlay(){ play.classList.add('show'); }
+  function hidePlay(){ play.classList.remove('show'); }
+
+  // Respect reduced-motion: don't autoplay, offer the control instead.
+  if (reduce) {
+    v.removeAttribute('loop');
+    showPlay();
+  } else {
+    const p = v.play();
+    if (p && p.catch) p.catch(showPlay); // autoplay blocked -> show tap target
+  }
+
+  play.addEventListener('click', () => { v.play(); hidePlay(); });
+  v.addEventListener('play', hidePlay);
+
+  // Tap the video to pause/resume (only meaningful once playing)
+  v.addEventListener('click', () => { v.paused ? v.play() : v.pause(); });
+
+  fs.addEventListener('click', () => {
+    const el = v.closest('.frame');
+    if (document.fullscreenElement) document.exitFullscreen();
+    else (el.requestFullscreen || el.webkitRequestFullscreen || v.webkitEnterFullscreen).call(el.webkitRequestFullscreen ? el : v);
+  });
+</script>
+</body>
+</html>
